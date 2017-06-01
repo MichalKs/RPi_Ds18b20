@@ -5,22 +5,24 @@
  *      Author: mik
  */
 
-#include <Ds18b20.h>
+#include "Ds18b20.h"
+#include "Utils.h"
 #include <iostream>
 #include <dirent.h>
 #include <stddef.h>
-#include <regex.h>
+#include <fstream>
 
 namespace rpilibs {
 
 const string Ds18b20::ONEWIRE_DEVICES_PATH = "/sys/bus/w1/devices/";
+const string Ds18b20::ONEWIRE_DATA_FILE = "/w1_slave";
 
 Ds18b20::Ds18b20() {
   cout << "Initializing DS18B20" << endl;
+  id = "";
 
   DIR * onewireDirectory = opendir(ONEWIRE_DEVICES_PATH.c_str());
   if (onewireDirectory == NULL) {
-    id = 0;
     return;
   }
 
@@ -30,12 +32,12 @@ Ds18b20::Ds18b20() {
     if (directoryEntry == NULL) {
       break;
     }
-    cout << "Filename: " << directoryEntry->d_name << endl;
     if (checkSensorIdValidity(directoryEntry->d_name)) {
-      // Is a valid sensor ID
+      id = directoryEntry->d_name;
+      break;
     }
   }
-
+  cout << "Device ID = " << id << endl;
   closedir(onewireDirectory);
 }
 
@@ -44,13 +46,28 @@ Ds18b20::~Ds18b20() {
 }
 
 double Ds18b20::readTemperatureCelsius() {
+  if (id == Utils::EMPTY_STRING) {
+    return 0;
+  }
 
-  return 0;
+  string filename = ONEWIRE_DEVICES_PATH + id + ONEWIRE_DATA_FILE;
+  string dataLine;
+  ifstream thermometerFile(filename.c_str());
+  if (thermometerFile.is_open()) {
+    while (getline(thermometerFile, dataLine)) {
+      cout << dataLine << endl;
+    }
+    thermometerFile.close();
+  } else {
+    cout << "Unable to open file" << endl;
+  }
+
+  return 22.1;
 }
 
 bool Ds18b20::checkSensorIdValidity(const char * filename) {
-
-  return true;
+  const char * DEVICE_FILE_REGEX = "28\\-[0-9a-fA-F]{4}";
+  return Utils::checkRegexMatch(DEVICE_FILE_REGEX, filename);
 }
 
 } /* namespace rpilibs */

@@ -30,17 +30,17 @@ using namespace rpilibs;
  */
 int main(int argc, char * argv[]) {
 
-  cout << "Hello world!!!" << endl;
+  cout << "Starting program" << endl;
   const int DELAY_TIME_MILLIS = 500;
-  const int LED_PIN_NUMBER = 17;
-  Gpio * led = new Gpio(LED_PIN_NUMBER, Gpio::DIRECTION_OUTPUT);
+//  const int LED_PIN_NUMBER = 17;
+//  Gpio * led = new Gpio(LED_PIN_NUMBER, Gpio::DIRECTION_OUTPUT);
   Ds18b20 * thermometer = new Ds18b20();
 
   while (true) {
 //    led->toggle();
 //    cout << "Pin value: " << led->read() << endl;
-//    cout << "Temperature: " << thermometer->readTemperatureCelsius() << endl;
-//    Utils::delayMillis(DELAY_TIME_MILLIS);
+    cout << "Temperature: " << thermometer->readTemperatureCelsius() << endl;
+    Utils::delayMillis(DELAY_TIME_MILLIS);
   }
   return 0;
 }

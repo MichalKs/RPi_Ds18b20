@@ -20,11 +20,11 @@ public:
   virtual ~Ds18b20();
   double readTemperatureCelsius();
 
-
 private:
   bool checkSensorIdValidity(const char * filename);
-  int id;
+  string id;
   static const string ONEWIRE_DEVICES_PATH;
+  static const string ONEWIRE_DATA_FILE;
 };
 
 } /* namespace rpilibs */
