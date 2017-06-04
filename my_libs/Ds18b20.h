@@ -16,15 +16,28 @@ namespace rpilibs {
 
 class Ds18b20 {
 public:
+  /**
+   * @brief Constructor for sensor. Gets sensor ID from list of devices on bus.
+   */
   Ds18b20();
   virtual ~Ds18b20();
+  /**
+   * @brief Reads temperature in degress Celsius
+   * @return Temperature in Celsius
+   */
   double readTemperatureCelsius();
 
 private:
+  /**
+   * @brief Checks if filename corresponds to sensor ID
+   * @param filename File name to check
+   * @retval true File name corresponds to device ID
+   * @retval false File name does not correspond to device ID
+   */
   bool checkSensorIdValidity(const char * filename);
-  string id;
-  static const string ONEWIRE_DEVICES_PATH;
-  static const string ONEWIRE_DATA_FILE;
+  string id; ///< ID of sensor
+  static const string ONEWIRE_DEVICES_PATH; ///< Path to onewire devices
+  static const string ONEWIRE_DATA_FILE;    ///< Data file for thermometer
 };
 
 } /* namespace rpilibs */

@@ -11,6 +11,7 @@
 #include <dirent.h>
 #include <stddef.h>
 #include <fstream>
+#include <sstream>
 
 namespace rpilibs {
 
@@ -51,18 +52,40 @@ double Ds18b20::readTemperatureCelsius() {
   }
 
   string filename = ONEWIRE_DEVICES_PATH + id + ONEWIRE_DATA_FILE;
-  string dataLine;
+
   ifstream thermometerFile(filename.c_str());
-  if (thermometerFile.is_open()) {
-    while (getline(thermometerFile, dataLine)) {
-      cout << dataLine << endl;
-    }
-    thermometerFile.close();
-  } else {
+  if (!thermometerFile.is_open()) {
     cout << "Unable to open file" << endl;
+    return 0;
   }
 
-  return 22.1;
+  string crcLine;
+  getline(thermometerFile, crcLine);
+  const string YES_STRING = "YES";
+  if (crcLine.find(YES_STRING) == string::npos) {
+    cout << "CRC invalid" << endl;
+    return 0;
+  }
+
+  string temperatureLine;
+  getline(thermometerFile, temperatureLine);
+
+  const string TEMPERATURE_STRING = "t=";
+  string::size_type temperaturePosition = temperatureLine.find(TEMPERATURE_STRING);
+  if (temperaturePosition == string::npos) {
+    cout << "No temperature found" << endl;
+    return 0;
+  }
+  string temperatureValue = temperatureLine.substr(temperaturePosition +
+      TEMPERATURE_STRING.length());
+
+  int rawTemperature;
+  istringstream temperatureStream(temperatureValue);
+  temperatureStream >> rawTemperature;
+  thermometerFile.close();
+
+  const double UNITS_TO_MILLIS = 1000.0;
+  return rawTemperature/UNITS_TO_MILLIS;
 }
 
 bool Ds18b20::checkSensorIdValidity(const char * filename) {
